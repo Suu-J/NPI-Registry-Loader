@@ -3,8 +3,14 @@
 Scripts for loading data into Snowflake, typically from downloaded files or S3.
 Data comes from a gov website, once it's parsed, it's loaded into a snowflake table.
 
-## Primary Scripts:
+# currently pushing scripts
+- direct_local_load_main.py
 
+
+
+
+## ---------------------------------------------------------------------------------
+## Primary Scripts:
 
 ## Direct Load Scripts
 - **direct_local_load.py** - Downloads file, unzips, saves locally, loads to Snowflake
