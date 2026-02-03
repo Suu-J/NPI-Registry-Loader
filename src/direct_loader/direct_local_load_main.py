@@ -1,6 +1,25 @@
 '''
-# Pending docstring
-# remove commandlines
+This script is for maintain a replication table of the Monthly NPI registry publication
+
+Script Strategy: Direct Load into snowflake
+Downloads ZIP → extracts CSV → saves locally → PUT to Snowflake stage → COPY INTO table
+
+- Logging configured, drops a log file after every run.
+- Extracting from the NPI website, file is dropped mid month
+- Using requests.get we fetch the HTML of the website
+- Using the HTML we parse it using Beautiful Soup
+- The download link is present in an anchor tag
+- We create a buffer and download it
+
+# Snowflake cursor steps
+
+- Start a transaction
+- Truncate the table
+- Create a temporary stage
+- Upload the file to the Snowflake stage
+- Load the data into the table
+- Commit the transaction if everything is successful
+
 '''
 
 import requests
@@ -17,7 +36,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Configure logging
+# Logging configurations
 log_filename = f"LOG_{datetime.now().strftime('%Y_%B_%d')}.log"
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -25,25 +44,22 @@ logging.basicConfig(level=logging.INFO,
                         logging.FileHandler(log_filename),
                         logging.StreamHandler()
                     ])
-# Log the start date and time
+
 logging.info(f"Script started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-# SOURCE URL where the download file is located.
 WEBSITE_URL = "https://download.cms.gov/nppes/NPI_Files.html"
 
 start_time = time.time()
 
 try:
-    # Get HTML of the website
     response = requests.get(WEBSITE_URL, timeout=(10, 1000))
     if response.status_code != 200:
         raise Exception(f"Failed to load page {WEBSITE_URL}")
     logging.info("Loaded Page")
 
-    # BSoup is a HTML parser!
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Find the anchor tag with an ID that starts with 'DDSMTH.ZIP'
+    # finding the anchor tag with an ID that starts with 'DDSMTH.ZIP'
     anchor_tag = soup.find('a', id=re.compile(r'^DDSMTH\.ZIP'))
     if not anchor_tag:
         raise Exception("Download link not found")
@@ -58,6 +74,7 @@ try:
         raise Exception(f"Failed to download file from {download_url}")
     logging.info("Got 200 file_response")
     logging.info("Downloading...")
+
     # Save the downloaded file to a buffer
     buffer = io.BytesIO(file_response.content)
     desired_file_name = None
@@ -77,7 +94,7 @@ try:
     logging.info("File Found")
 
     logging.info("Saving file...")
-    # Save the desired file to the current working directory
+    # saving the desired file to the current working directory
     current_directory = os.getcwd()
     file_path = os.path.join(current_directory, desired_file_name)
     with open(file_path, 'wb') as file:
@@ -97,32 +114,26 @@ try:
     try:
         cursor = conn.cursor()
 
-        # Start a transaction
         cursor.execute("BEGIN")
 
-        # Truncate the table
         cursor.execute("TRUNCATE TABLE PLAYGROUND_TEST.STAGE.ENDPOINT")
 
-        # Create a temporary stage
         cursor.execute("CREATE OR REPLACE TEMPORARY STAGE temp_stage")
 
-        # Upload the file to the Snowflake stage
         cursor.execute(f"PUT file://{file_path} @temp_stage")
 
-        # Load the data into the table
         cursor.execute("""
             COPY INTO PLAYGROUND_TEST.STAGE.ENDPOINT
             FROM @temp_stage
             FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1)
         """)
 
-        # Commit the transaction if everything is successful
         cursor.execute("COMMIT")
 
         logging.info("Data loaded into Snowflake table successfully!")
 
     except Exception as e:
-        # Rollback the transaction in case of any error
+        # cancel and rollback the transaction in case of any error
         cursor.execute("ROLLBACK")
         error_message = f"An error occurred while loading data into Snowflake: {e}"
         logging.info("LOAD FAILED:")
@@ -131,7 +142,6 @@ try:
         cursor.close()
         conn.close()
 
-    # Clean up the file
     os.remove(file_path)
 
 except Exception as e:
