@@ -6,7 +6,7 @@ Data comes from a gov website, once it's parsed, it's loaded into a snowflake ta
 # currently pushing scripts
 - direct_local_load_main.py -> renamed to NPI_direct_local_to_snowflake.py
 - npi_failover_data_loader.py
-
+- Phase2_npi_failover_data_loader.py
 
 
 ## ---------------------------------------------------------------------------------
