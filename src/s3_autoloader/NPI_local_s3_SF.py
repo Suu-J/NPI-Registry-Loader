@@ -1,4 +1,7 @@
 '''
+Process Flow:
+Download File -> Upload to S3 -> Transfer to Snowflake
+
 Email notification was integrated within the script,
 Could have modularised this to be honest, but this was for quick prototyping
 
