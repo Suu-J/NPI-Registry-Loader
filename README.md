@@ -8,7 +8,7 @@ Data comes from a gov website, once it's parsed, it's loaded into a snowflake ta
 - npi_failover_data_loader.py
 - Phase2_npi_failover_data_loader.py
 
-- Data_Load_Notif.py -> Needs audit still ( consider renaming later )
+- Data_Load_Notif.py -> renamed to NPI_local_s3_SF.py
 
 ## ---------------------------------------------------------------------------------
 ## Primary Scripts:
