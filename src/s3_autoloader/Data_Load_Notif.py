@@ -1,16 +1,11 @@
-
 '''
-AUDIT PENDING!!
+Email notification was integrated within the script,
+Could have modularised this to be honest, but this was for quick prototyping
 
-Email notification was integrated within the script itself,
-could have modularised this to be honest.
+Snowflake Procedure Triggered within the script
+ID hybridized using re
 
-
-# OLDER SCRIPT, was archived as email notification idea was dropped, but still useful.
-# NOTES : Calls the Procedure internally itself.
-# Figure out how to make hybird ID...
-
-
+tqdm for uploading bar
 
 '''
 
@@ -31,7 +26,7 @@ from email.mime.multipart import MIMEMultipart
 # SOURCE URL where the download file is located.
 website_url = "https://download.cms.gov/nppes/NPI_Files.html"
 
-# AWS credentials for S3 Bucket/boto3
+#creds
 s3_bucket_name = ""
 s3_key_prefix = ""
 
@@ -66,14 +61,14 @@ def send_email(subject, body):
         print(f"Failed to send email: {e}")
 
 
-# Get HTML of the website
+# Fetching HTML of the website
 response = requests.get(website_url)
 if response.status_code != 200:
     raise Exception(f"Failed to load page {website_url}")
 else:
     print("Loaded Page")
 
-# BSoup is a HTML parser!
+# Parsing HTML using bsoup
 soup = BeautifulSoup(response.content, 'html.parser')
 
 # Lock on to the anchor tag with the known id
