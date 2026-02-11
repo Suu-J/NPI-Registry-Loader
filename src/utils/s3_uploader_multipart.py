@@ -41,8 +41,6 @@ else:
     print("Got 200 file_response")
 
 current_datetime = datetime.now()
-# s3_file_key = f"{s3_key_prefix}NPPES_Data_Dissemination_{current_datetime.strftime('%B_%Y')}.csv"
-# s3_file_key = f"{s3_key_prefix}TESTING_GLUE{current_datetime.strftime('%B_%Y')}.csv"
 s3_file_key = f"{s3_key_prefix}TESTING_GLUE.csv"
 
 
