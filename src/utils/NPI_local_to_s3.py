@@ -3,8 +3,6 @@ Website -> S3 Bucket
 
 Here, it just uploads to S3 bucket after downloading the file
 '''
-
-
 import requests
 from bs4 import BeautifulSoup
 import boto3
