@@ -10,8 +10,8 @@ Data comes from a gov website, once it's parsed, it's loaded into a snowflake ta
 
 - Data_Load_Notif.py -> renamed to NPI_local_s3_SF.py
 
-- s3_upload.py -> Needs renaming and comms audit
-- s3_uploader_multipart.py -> consider renaming and comms audit
+- s3_upload.py -> renamed to NPI_local_to_s3.py -> Needs renaming and comms audit
+- s3_uploader_multipart.py -> renamed to NPI_local_to_s3_multipart.py -> consider renaming and comms audit
 
 ## ---------------------------------------------------------------------------------
 ## Primary Scripts:
