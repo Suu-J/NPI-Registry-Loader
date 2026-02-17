@@ -1,3 +1,15 @@
+'''
+Alt version of the NPI local to s3 script using multipart.
+
+Flow:
+Download from nppes dissemination,
+save to local,
+s3 multipart upload,
+
++tqdm for loading bar :)
+
+'''
+
 import requests
 from bs4 import BeautifulSoup
 import boto3
